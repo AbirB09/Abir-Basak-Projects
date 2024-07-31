@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Number Generator</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #256535; 
+            color: #ffd700; 
+            text-align: center;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #4a0707;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            border: 5px solid #ffd700;
+            max-width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: #ffd700; 
+            font-size: 4em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+        .slot {
+            background: linear-gradient(135deg, #ffd700, #e0b700);
+            border: 4px solid #ffd700;
+            border-radius: 20px;
+            width: 150px;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3em;
+            margin: 30px;
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: transform 1s;
+        }
+        .slot::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle closest-side, rgba(255, 215, 0, 0.4), transparent);
+            border-radius: 20px;
+            z-index: -1;
+        }
+        .slot::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 20px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .controls div {
+            margin: 0 20px;
+        }
+        select {
+            background: #2e2e2e;
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 10px;
+            color: #ffd700;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        button {
+            background: linear-gradient(145deg, #ffd700, #e0b700);
+            border: none;
+            border-radius: 40px;
+            padding: 20px 50px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.8);
+        }
+        button:hover {
+            transform: scale(1.05);
+        }
+        .fireworks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Random Number Generator</h1>
+        <div class="controls">
+            <div>
+                <label for="digits">Digits per Number:</label>
+                <select id="digits">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+            <div>
+                <label for="numbers">Number of Numbers:</label>
+                <select id="numbers">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+        </div>
+        <div class="slot-machine" id="slot-machine"></div>
+        <button id="generate">Generate Numbers</button>
+        <canvas id="fireworks" class="fireworks"></canvas>
+    </div>
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+    </audio>
+    <script>
+        function generateSlots() {
+            const slotMachine = document.getElementById('slot-machine');
+            slotMachine.innerHTML = '';
+            const numberOfNumbers = document.getElementById('numbers').value;
+            for (let i = 0; i < numberOfNumbers; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.textContent = '0';
+                slotMachine.appendChild(slot);
+            }
+        }
+        document.getElementById('numbers').addEventListener('change', generateSlots);
+
+        document.getElementById('generate').addEventListener('click', () => {
+            generateSlots();
+            const audio = document.getElementById('backgroundMusic');
+            audio.play().catch(error => console.error('Audio playback failed:', error));
+
+            const slotMachine = document.getElementById('slot-machine');
+            const slots = document.querySelectorAll('.slot');
+            const digits = document.getElementById('digits').value;
+            const duration = 3000;
+
+            slots.forEach(slot => {
+                rollSlot(slot, digits, duration);
+            });
+
+            setTimeout(() => {
+                triggerConfetti();
+                triggerFireworks();
+            }, duration + 500);
+        });
+        function rollSlot(slot, digits, duration) {
+            const startTime = Date.now();
+            const roll = () => {
+                let randomNumber = '';
+                for (let i = 0; i < digits; i++) {
+                    randomNumber += Math.floor(Math.random() * 10);
+                }
+                slot.textContent = randomNumber;
+                if (Date.now() - startTime < duration) {
+                    requestAnimationFrame(roll);
+                }
+            };
+            roll();
+        }
+        function triggerConfetti() {
+            const confettiCanvas = document.getElementById('fireworks');
+            const confettiContext = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            confettiContext.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            confetti({
+                particleCount: 200,
+                spread: 180,
+                origin: { y: 0.6 }
+            });
+        }
+    </script>
+</body>
+</html>
+
+
+           
+
+
+
+
+
+
+
+       
+
+
+
+
+
+
+
+
+
+
+       
+
+
+
+
