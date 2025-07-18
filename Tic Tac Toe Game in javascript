@@ -1,0 +1,143 @@
+var board = ["", "", "", "", "", "", "", "", ""];
+var currentPlayer = "X";
+var running = true;
+
+var CELL_SIZE = 100;
+var GRID_SIZE = 3;
+
+function start() {
+    drawBoard();
+    drawMarks();
+    drawStatus(currentPlayer + "'s turn");
+    mouseClickMethod(handleClick);
+}
+
+function drawBoard() {
+    for (var row = 0; row < GRID_SIZE; row++) {
+        for (var col = 0; col < GRID_SIZE; col++) {
+            var cell = new Rectangle(CELL_SIZE, CELL_SIZE);
+            cell.setPosition(col * CELL_SIZE, row * CELL_SIZE);
+            cell.setColor(Color.white);
+            cell.setBorderColor(Color.black);
+            cell.setBorderWidth(3);
+            add(cell);
+        }
+    }
+    
+    var button = new Rectangle(100, 40);
+    button.setPosition(100, 320);
+    button.setColor(Color.gray);
+    button.setBorderColor(Color.black);
+    add(button);
+    
+    var buttonText = new Text("Restart", "18pt Arial");
+    buttonText.setPosition(115, 350);
+    buttonText.setColor(Color.black);
+    add(buttonText);
+}
+
+function drawStatus(text) {
+    var status = new Text(text, "16pt Arial");
+    status.setPosition(10, 20); // Top-left corner
+    status.setColor(Color.black);
+    add(status);
+}
+
+function handleClick(e) {
+    var x = e.getX();
+    var y = e.getY();
+    
+    if (x >= 100 && x <= 200 && y >= 320 && y <= 360) {
+        restartGame();
+        return;
+    }
+    
+    if (!running) return;
+    
+    var col = Math.floor(x / CELL_SIZE);
+    var row = Math.floor(y / CELL_SIZE);
+    var index = row * GRID_SIZE + col;
+    
+    if (!isCellEmpty(index)) {
+        return;
+    }
+    
+    board[index] = currentPlayer;
+    
+    removeAll();
+    drawBoard();
+    drawMarks();
+    
+    placeMark(row, col, currentPlayer);
+    
+    if (checkWinner()) {
+        drawStatus(currentPlayer + " wins!");
+        running = false;
+    } else if (isBoardFull()) {
+        drawStatus("Draw!");
+        running = false;
+    } else {
+        switchPlayer();
+        drawStatus(currentPlayer + "'s turn");
+    }
+}
+
+function placeMark(row, col, player) {
+    var mark = new Text(player, "36pt Arial");
+    mark.setPosition(col * CELL_SIZE + 30, row * CELL_SIZE + 70);
+    mark.setColor(player == "X" ? Color.blue : Color.red);
+    add(mark);
+}
+
+function drawMarks() {
+    for (var i = 0; i < board.length; i++) {
+        if (board[i] !== "") {
+            var row = Math.floor(i / GRID_SIZE);
+            var col = i % GRID_SIZE;
+            placeMark(row, col, board[i]);
+        }
+    }
+}
+
+function switchPlayer() {
+    currentPlayer = (currentPlayer == "X") ? "O" : "X";
+}
+
+function checkWinner() {
+    var wins = [
+        [0,1,2], [3,4,5], [6,7,8], // rows
+        [0,3,6], [1,4,7], [2,5,8], // columns
+        [0,4,8], [2,4,6]           // diagonals
+    ];
+    
+    for (var i = 0; i < wins.length; i++) {
+        var [a, b, c] = wins[i];
+        if (board[a] !== "" && board[a] == board[b] && board[b] == board[c]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function isCellEmpty(index) {
+    return board[index] == "";
+}
+
+function isBoardFull() {
+    for (var i = 0; i < board.length; i++) {
+        if (board[i] == "") {
+            return false;
+        }
+    }
+    return true;
+}
+
+function restartGame() {
+    board = ["", "", "", "", "", "", "", "", ""];
+    currentPlayer = "X";
+    running = true;
+    removeAll();
+    drawBoard();
+    drawMarks();
+    drawStatus(currentPlayer + "'s turn");
+}
