@@ -1,0 +1,68 @@
+//list of possible responses
+var responses = [
+    "Yes", "No", "Maybe", "Ask again", "Definitely", 
+    "Not a chance", "Absolutely", "Doubtful", "Try later","Sure"
+];
+
+var ball, triangle, text, responseText;
+
+// Main function to start the program
+function start() {
+    drawBall();
+    mouseClickMethod(handleClick);
+}
+
+// Draws the Magic 8-Ball 
+function drawBall() {
+    // Outer Black Circle 
+    ball = new Circle(100);
+    ball.setPosition(getWidth() / 2, getHeight() / 2);
+    ball.setColor(Color.BLACK);
+    add(ball);
+
+    // The white oval for the shine effect
+    var shine = new Oval(30, 15); 
+    shine.setPosition(getWidth() / 2 - 35, getHeight() / 2 - 60);
+    shine.setColor(new Color(255, 255, 255, 90)); 
+    add(shine);
+
+    // Inner Blue Triangle
+    triangle = new Polygon();
+    triangle.addPoint(-30, 20);
+    triangle.addPoint(30, 20);
+    triangle.addPoint(0, -30);
+    triangle.setPosition(getWidth() / 2, getHeight() / 2);
+    triangle.setColor(Color.BLUE);
+    add(triangle);
+
+    // "8" in the center
+    text = new Text("8");
+    text.setFont("30pt Arial");
+    text.setColor(Color.WHITE);
+    text.setPosition(getWidth() / 2 - 10, getHeight() / 2 + 10);
+    add(text);
+
+    // Response text 
+    responseText = new Text("");
+    responseText.setFont("16pt Arial");
+    responseText.setColor(Color.WHITE);
+    responseText.setPosition(getWidth() / 2, getHeight() / 2 + 50);
+    add(responseText);
+}
+
+// Function for mouse clicks
+function handleClick(e) {
+    var response = getRandomResponse();
+    
+    // Update the response text 
+    responseText.setText(response);
+    
+    // Center the text correctly
+    responseText.setPosition(getWidth() / 2 - responseText.getWidth() / 2, getHeight() / 2 + 50);
+}
+
+// Function to get a random response from the list
+function getRandomResponse() {
+    var index = Randomizer.nextInt(0, responses.length - 1);
+    return responses[index];
+}
