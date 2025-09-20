@@ -5,8 +5,9 @@ public class RandomNumberGenerator {
         Random number = new Random();
 
         //This generates a random number between 1 and 1000
-        int randomNumber = rand.nextInt(1000) + 1;
+        int randomNumber = number.nextInt(1000) + 1;
 
         System.out.println("Your random number is: " + randomNumber);
     }
 }
+
