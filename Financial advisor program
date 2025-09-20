@@ -1,0 +1,52 @@
+import java.util.Scanner;
+
+public class FinancialAdvisorWebsite {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+
+        
+        System.out.print("Please enter your monthly income: $");
+        double income = input.nextDouble();
+
+        // Get user expenses
+        System.out.print("Please your total monthly expenses: $");
+        double expenses = input.nextDouble();
+
+        // Get savings goal
+        System.out.print("Please your desired monthly savings: $");
+        double savingsGoal = input.nextDouble();
+
+        double savings = income - expenses;
+
+        System.out.println("\n--- Financial Advice ---");
+
+        if (leftover <= 0) {
+            System.out.println("You are spending more than you earn. Consider cutting unnecessary expenses.");
+        } else {
+            System.out.println(" You have $" + leftover + " left after expenses.");
+            
+            if (savings >= savingsGoal) {
+                System.out.println("You can reach your savings goal of $" + savingsGoal + ".");
+                System.out.println("Maybe consider investing some 10-20 percent for long-term growth.");
+            } else {
+                System.out.println("You fall short of your savings goal by $" + (savingsGoal - leftover) + ".");
+                System.out.println("Try reducing unecessary spending or finding ways to increase income.");
+            }
+        }
+
+        // Simple financial rule suggestion
+        double Savingsforemergencyfund = income * 0.20;
+        System.out.println("\n General rule is save at least 20% of your income for a emergency fund($" + Savingsforemergencyfund + ").");
+
+        input.close();
+    }
+}
+
+
+
+
+
+
+
+
+
